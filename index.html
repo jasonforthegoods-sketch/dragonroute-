@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DragonRoute — Interactive China Travel Guide</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0a0a0f;color:#f0ece4;min-height:100vh}
+header{background:#0f0f1a;border-bottom:1px solid #1e1e2e;padding:16px 24px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:100}
+.logo{width:36px;height:36px;background:#8b1a1a;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px}
+header h1{font-size:18px;font-weight:600;color:#f0ece4;letter-spacing:0.02em}
+header p{font-size:12px;color:#888;margin-top:1px}
+.nav{display:flex;gap:6px;margin-left:auto;flex-wrap:wrap}
+.nav button{padding:7px 14px;border:1px solid #2a2a3a;border-radius:20px;background:transparent;cursor:pointer;font-size:12px;color:#aaa;transition:all 0.15s}
+.nav button.active{background:#8b1a1a;color:#fff;border-color:#8b1a1a}
+.nav button:hover:not(.active){background:#1a1a2a;color:#f0ece4}
+main{max-width:900px;margin:0 auto;padding:32px 20px}
+.section{display:none}.section.active{display:block}
+.hero{text-align:center;margin-bottom:32px}
+.hero h2{font-size:28px;font-weight:700;color:#f0ece4;margin-bottom:8px}
+.hero p{font-size:15px;color:#888;line-height:1.7}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:24px}
+.card{background:#0f0f1a;border:1px solid #1e1e2e;border-radius:12px;padding:20px;cursor:pointer;transition:all 0.2s}
+.card:hover{border-color:#8b1a1a;transform:translateY(-2px)}
+.card.selected{border-color:#8b1a1a;background:#1a0f0f}
+.card-icon{font-size:28px;margin-bottom:10px}
+.card h3{font-size:15px;font-weight:600;margin-bottom:6px;color:#f0ece4}
+.card p{font-size:12px;color:#888;line-height:1.5}
+.tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.tag{font-size:10px;padding:3px 8px;border-radius:10px;background:#1a1a2a;border:1px solid #2a2a3a;color:#888}
+.detail{background:#0f0f1a;border:1px solid #1e1e2e;border-radius:12px;padding:24px;margin-top:4px}
+.detail h2{font-size:20px;font-weight:600;margin-bottom:8px;color:#f0ece4}
+.detail p{font-size:14px;color:#aaa;line-height:1.7;margin-bottom:12px}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:12px}
+.detail-box{background:#1a1a2a;border-radius:8px;padding:12px}
+.detail-box h4{font-size:10px;color:#666;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
+.detail-box p{font-size:13px;color:#f0ece4;margin:0}
+.select-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.select-row label{font-size:13px;color:#888;align-self:center}
+select{padding:8px 12px;border:1px solid #2a2a3a;border-radius:8px;background:#0f0f1a;color:#f0ece4;font-size:14px;cursor:pointer}
+.itin-step{display:flex;gap:14px;align-items:flex-start;margin-bottom:16px}
+.day-badge{min-width:52px;background:#8b1a1a;color:#fff;border-radius:8px;padding:6px 8px;font-size:11px;font-weight:600;text-align:center;line-height:1.3}
+.itin-body h4{font-size:14px;font-weight:600;color:#f0ece4;margin-bottom:3px}
+.itin-body p{font-size:13px;color:#888;line-height:1.6}
+.phrase-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid #1e1e2e}
+.phrase-row:last-child{border-bottom:none}
+.zh{font-size:24px;font-weight:600;color:#f0ece4}
+.py{font-size:12px;color:#8b1a1a;margin-top:3px}
+.en{font-size:13px;color:#888;text-align:right}
+.visa-block{border-left:3px solid #8b1a1a;padding-left:16px;margin-bottom:20px}
+.visa-block h4{font-size:14px;font-weight:600;color:#f0ece4;margin-bottom:4px}
+.visa-block p{font-size:13px;color:#888;line-height:1.7}
+.badge-free{display:inline-block;background:#1a2a1a;color:#4a9;border:1px solid #2a4a2a;font-size:11px;padding:3px 10px;border-radius:10px;margin-bottom:12px}
+.badge-pro{display:inline-block;background:#2a1a0a;color:#ca7;border:1px solid #4a2a0a;font-size:11px;padding:3px 10px;border-radius:10px;margin-bottom:12px}
+.upgrade-bar{background:#1a0f0f;border:1px solid #3a1a1a;border-radius:12px;padding:20px;margin-top:24px;text-align:center}
+.upgrade-bar h3{font-size:16px;font-weight:600;color:#f0ece4;margin-bottom:6px}
+.upgrade-bar p{font-size:13px;color:#888;margin-bottom:14px}
+.upgrade-bar a{display:inline-block;background:#8b1a1a;color:#fff;padding:10px 28px;border-radius:8px;text-decoration:none;font-size:14px;font-weight:600;transition:background 0.15s}
+.upgrade-bar a:hover{background:#a02020}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">&#9775;</div>
+  <div>
+    <h1>DragonRoute</h1>
+    <p>Interactive China travel guide by a local</p>
+  </div>
+  <nav class="nav">
+    <button class="active" onclick="show('cities',this)">Cities</button>
+    <button onclick="show('itinerary',this)">Itinerary</button>
+    <button onclick="show('food',this)">Food</button>
+    <button onclick="show('visa',this)">Visa & tips</button>
+    <button onclick="show('phrases',this)">Phrases</button>
+  </nav>
+</header>
+
+<main>
+
+  <div id="sec-cities" class="section active">
+    <div class="hero">
+      <h2>Explore China's top destinations</h2>
+      <p>Click any city to see expert tips, best timing, and where to stay — written by a local.</p>
+    </div>
+    <div class="grid" id="city-grid"></div>
+    <div id="city-detail" style="display:none" class="detail"></div>
+    <div class="upgrade-bar">
+      <h3>Want hidden gems & insider routes?</h3>
+      <p>Pro members get deeper city guides, secret spots, and local food recommendations most tourists never find.</p>
+      <a href="https://whop.com/dragonroute" target="_blank">Upgrade to Pro — $9.99/month</a>
+    </div>
+  </div>
+
+  <div id="sec-itinerary" class="section">
+    <div class="hero">
+      <h2>Build your China itinerary</h2>
+      <p>Pick your trip length and focus — get a day-by-day plan built from real experience.</p>
+    </div>
+    <div class="select-row">
+      <label>Trip length</label>
+      <select id="itin-days" onchange="buildItin()">
+        <option value="5">5 days</option>
+        <option value="7" selected>7 days</option>
+        <option value="10">10 days</option>
+        <option value="14">14 days</option>
+      </select>
+      <label>Focus</label>
+      <select id="itin-focus" onchange="buildItin()">
+        <option value="classic">Classic highlights</option>
+        <option value="nature">Nature & scenery</option>
+        <option value="food">Food & culture</option>
+      </select>
+    </div>
+    <div id="itin-output" class="detail"></div>
+    <div class="upgrade-bar" style="margin-top:16px">
+      <h3>Want a personalised itinerary?</h3>
+      <p>Pro members can request a custom plan written specifically for their dates, budget, and travel style.</p>
+      <a href="https://whop.com/dragonroute" target="_blank">Get a custom plan — $9.99/month</a>
+    </div>
+  </div>
+
+  <div id="sec-food" class="section">
+    <div class="hero">
+      <h2>China food guide</h2>
+      <p>What to eat, where to eat it, and what to avoid — from someone who actually lives here.</p>
+    </div>
+    <div class="grid" id="food-grid"></div>
+    <div id="food-detail" style="display:none" class="detail"></div>
+    <div class="upgrade-bar">
+      <h3>Want restaurant recommendations by city?</h3>
+      <p>Pro members get specific restaurant picks, street food maps, and dishes to order in Chinese.</p>
+      <a href="https://whop.com/dragonroute" target="_blank">Upgrade to Pro — $9.99/month</a>
+    </div>
+  </div>
+
+  <div id="sec-visa" class="section">
+    <div class="hero">
+      <h2>Visa & practical travel tips</h2>
+      <p>Everything you need to know before you land — updated regularly as rules change.</p>
+    </div>
+    <div class="detail" style="display:block">
+      <span class="badge-free">Free</span>
+      <div class="visa-block">
+        <h4>144-hour visa-free transit</h4>
+        <p>Citizens of 54 countries including USA, UK, EU nations, Australia and Canada can enter without a visa for up to 144 hours through designated ports: Beijing, Shanghai, Guangzhou, Chengdu, and others. You must have an onward ticket to a third country.</p>
+      </div>
+      <div class="visa-block">
+        <h4>Standard tourist visa (L visa)</h4>
+        <p>Apply at your nearest Chinese consulate. You need: passport, completed application, photo, round-trip flight confirmation, and hotel bookings. Processing takes 4–5 business days. Single entry is usually sufficient for first-time visitors.</p>
+      </div>
+      <div class="visa-block">
+        <h4>Payment — WeChat Pay & cash</h4>
+        <p>WeChat Pay and Alipay dominate everywhere. Foreign visitors can now link international Visa/Mastercard to WeChat Pay — set this up before you go. Always carry some RMB cash for small vendors, taxis, and rural areas.</p>
+      </div>
+      <div class="visa-block">
+        <h4>Internet & VPN</h4>
+        <p>Google, WhatsApp, Instagram, and most Western apps are blocked in China. Download and test a VPN before you arrive — it will not work once you're inside China without prior setup. Local apps to use: Baidu (search), WeChat (everything), Didi (rides).</p>
+      </div>
+      <div class="visa-block">
+        <h4>Best times to visit</h4>
+        <p>Spring (April–May) and Autumn (September–October) are ideal — mild weather, manageable crowds. Avoid Golden Week (Oct 1–7) and Chinese New Year — domestic tourism peaks sharply and prices double.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="sec-phrases" class="section">
+    <div class="hero">
+      <h2>Essential Chinese phrases</h2>
+      <p>The most useful phrases for travellers — with pronunciation guide.</p>
+    </div>
+    <div class="detail" style="display:block">
+      <span class="badge-free">Free</span>
+      <div id="phrase-list"></div>
+    </div>
+    <div class="upgrade-bar">
+      <h3>Want a full language survival kit?</h3>
+      <p>Pro members get 80+ phrases, audio pronunciation tips, and how to read menus and signs.</p>
+      <a href="https://whop.com/dragonroute" target="_blank">Upgrade to Pro — $9.99/month</a>
+    </div>
+  </div>
+
+</main>
+
+<script>
+const cities=[
+  {name:"Beijing",icon:"🏯",tags:["History","Capital","Culture"],desc:"China's political and cultural heart. The Forbidden City, Tiananmen Square, Temple of Heaven — and the Great Wall just an hour away at Mutianyu. Beijing rewards slow exploration.",best:"Apr–May, Sep–Oct",days:"4–5 days",stay:"Wangfujing or Sanlitun"},
+  {name:"Shanghai",icon:"🌆",tags:["Modern","Cosmopolitan","Food"],desc:"China's global city — the Bund waterfront, Art Deco architecture, neon-lit Pudong skyline. World-class restaurants, vibrant nightlife, and the best coffee scene in China.",best:"Apr–May, Oct–Nov",days:"3–4 days",stay:"French Concession or The Bund"},
+  {name:"Xi'an",icon:"⚔️",tags:["History","Silk Road","Terracotta"],desc:"Home of the Terracotta Army and ancient city walls. A Silk Road hub for millennia, with a vibrant Muslim Quarter full of incredible street food you won't find anywhere else.",best:"Apr–May, Sep–Oct",days:"2–3 days",stay:"Near the Bell Tower"},
+  {name:"Chengdu",icon:"🐼",tags:["Pandas","Spicy food","Relaxed"],desc:"Panda capital of the world and home of Sichuan cuisine. Chengdu has a uniquely relaxed pace — teahouse culture, mahjong in the park, and the spiciest food you'll ever love.",best:"Apr–Jun, Sep–Nov",days:"3 days",stay:"Jinli or Chunxi Road"},
+  {name:"Guilin",icon:"⛰️",tags:["Nature","Karst","River"],desc:"The Li River and its karst limestone peaks are unlike anything else on earth. A boat ride from Guilin to Yangshuo is one of China's defining natural experiences.",best:"Apr–Oct",days:"3–4 days",stay:"Downtown Guilin or Yangshuo"},
+  {name:"Zhangjiajie",icon:"🌿",tags:["Avatar peaks","Hiking","Drama"],desc:"The floating sandstone pillars that inspired Avatar's Hallelujah Mountains. Glass bridges, canyon walks, and cable cars through the clouds — genuinely breathtaking.",best:"Apr–Oct",days:"2–3 days",stay:"Zhangjiajie city centre"}
+];
+
+const foods=[
+  {name:"Peking duck",icon:"🦆",region:"Beijing",tags:["Roast","Iconic"],desc:"Crispy lacquered duck with thin pancakes, spring onion, cucumber and hoisin. The real version takes a full day to prepare. Order at a proper duck restaurant, not a tourist trap."},
+  {name:"Xiaolongbao",icon:"🥟",region:"Shanghai",tags:["Soup dumplings","Must-try"],desc:"Delicate soup dumplings with hot pork broth inside. Bite a small hole first, sip the soup, then eat whole. The technique matters — don't rush it or you'll burn yourself."},
+  {name:"Mapo tofu",icon:"🌶️",region:"Sichuan",tags:["Spicy","Numbing"],desc:"Silken tofu in a fiery sauce of chilli bean paste, Sichuan pepper, and pork. The ma la (numbing-spicy) sensation from Sichuan pepper is unlike anything else — addictive."},
+  {name:"Roujiamo",icon:"🫓",region:"Xi'an",tags:["Street food","Meat"],desc:"China's original burger — a soft flatbread stuffed with slow-braised pork or lamb, herbs and chilli. A staple of Xi'an's Muslim Quarter that costs about ¥10–15."},
+  {name:"Dim sum",icon:"🍱",region:"Cantonese",tags:["Brunch","Variety"],desc:"Har gow, siu mai, cheung fun, egg tarts — a parade of small dishes. Best as a leisurely morning or midday meal with tea. The Cantonese call this yum cha, drinking tea."},
+  {name:"Hot pot",icon:"🍲",region:"Nationwide",tags:["Social","Customisable"],desc:"Simmering broth at the table — you dip raw meats, tofu, vegetables and noodles yourself. Sichuan style is numbing-spicy; Cantonese style is mild and clear. Both are perfect."}
+];
+
+const phrases=[
+  {zh:"你好",py:"Nǐ hǎo",en:"Hello"},
+  {zh:"谢谢",py:"Xièxiè",en:"Thank you"},
+  {zh:"不客气",py:"Bù kèqì",en:"You're welcome"},
+  {zh:"对不起",py:"Duìbuqǐ",en:"Sorry / Excuse me"},
+  {zh:"多少钱？",py:"Duōshǎo qián?",en:"How much?"},
+  {zh:"在哪里？",py:"Zài nǎlǐ?",en:"Where is...?"},
+  {zh:"我不懂",py:"Wǒ bù dǒng",en:"I don't understand"},
+  {zh:"有英文菜单吗？",py:"Yǒu yīngwén càidān ma?",en:"English menu?"},
+  {zh:"帮我叫出租车",py:"Bāng wǒ jiào chūzūchē",en:"Please call a taxi"},
+  {zh:"我迷路了",py:"Wǒ mí lù le",en:"I'm lost"},
+  {zh:"好吃！",py:"Hào chī!",en:"Delicious!"},
+  {zh:"太贵了",py:"Tài guì le",en:"Too expensive"}
+];
+
+const itins={
+  "5-classic":[{d:"1–2",t:"Beijing",p:"Forbidden City, Tiananmen Square, Great Wall at Mutianyu"},{d:"3",t:"Xi'an",p:"Terracotta Army, Muslim Quarter street food, ancient City Walls"},{d:"4–5",t:"Shanghai",p:"The Bund, French Concession, Yu Garden, rooftop at dusk"}],
+  "7-classic":[{d:"1–3",t:"Beijing",p:"Great Wall, Forbidden City, Temple of Heaven, Hutong walk"},{d:"4–5",t:"Xi'an",p:"Terracotta Army, Big Wild Goose Pagoda, Muslim Quarter night market"},{d:"6–7",t:"Shanghai",p:"The Bund, French Concession, Zhujiajiao water town day trip"}],
+  "10-classic":[{d:"1–3",t:"Beijing",p:"Great Wall, Forbidden City, Summer Palace, 798 Art District"},{d:"4–5",t:"Xi'an",p:"Terracotta Army, City Walls bike ride, Muslim Quarter"},{d:"6–7",t:"Chengdu",p:"Giant Panda Base, Leshan Buddha, Sichuan cooking class"},{d:"8–10",t:"Shanghai",p:"Bund, French Concession, day trip to Suzhou classical gardens"}],
+  "14-classic":[{d:"1–3",t:"Beijing",p:"Great Wall, Forbidden City, Hutong & temple tour"},{d:"4–5",t:"Xi'an",p:"Terracotta Army, Silk Road Museum, Muslim Quarter"},{d:"6–8",t:"Chengdu & Leshan",p:"Pandas, Leshan Buddha, Emei Shan hike"},{d:"9–11",t:"Guilin & Yangshuo",p:"Li River cruise, karst cycling, Longji rice terraces"},{d:"12–14",t:"Shanghai",p:"Bund, art galleries, day trip to Hangzhou West Lake"}],
+  "5-nature":[{d:"1–2",t:"Zhangjiajie",p:"Avatar peaks, glass bridge, Tianmen Mountain cable car"},{d:"3–5",t:"Guilin & Yangshuo",p:"Li River boat, karst cycling, Moon Hill hike"}],
+  "7-nature":[{d:"1–3",t:"Zhangjiajie",p:"Yuanjiajie scenic area, Tianmen Mountain, Baofeng Lake"},{d:"4–5",t:"Guilin",p:"Reed Flute Cave, Elephant Trunk Hill, Li River cruise"},{d:"6–7",t:"Yangshuo",p:"Bike the karst valley, night market, local cooking class"}],
+  "10-nature":[{d:"1–2",t:"Chengdu base",p:"Giant Pandas, teahouse culture, hotpot dinner"},{d:"3–5",t:"Jiuzhaigou",p:"UNESCO turquoise lakes and waterfalls in Sichuan mountains"},{d:"6–7",t:"Guilin",p:"Li River cruise to Yangshuo, Longji Rice Terraces"},{d:"8–10",t:"Zhangjiajie",p:"Sandstone pillar walks, glass bridge, canyon trails"}],
+  "14-nature":[{d:"1–2",t:"Chengdu",p:"Pandas, Qingcheng Mountain Taoist temple hike"},{d:"3–5",t:"Jiuzhaigou",p:"Crystal lakes, waterfalls, Tibetan village culture"},{d:"6–7",t:"Shangri-La",p:"Ganden Sumtseling Monastery, Napa Lake, alpine meadows"},{d:"8–9",t:"Guilin",p:"Li River cruise, karst landscapes"},{d:"10–11",t:"Yangshuo",p:"Cycling, Moon Hill, bamboo raft on Yulong River"},{d:"12–14",t:"Zhangjiajie",p:"Avatar peaks, glass walkways, Tianmen Mountain"}],
+  "5-food":[{d:"1–2",t:"Shanghai food trail",p:"Xiaolongbao breakfast, Shanghainese lunch, night market snacks"},{d:"3–4",t:"Chengdu",p:"Sichuan cooking class, mapo tofu, hotpot night, teahouse morning"},{d:"5",t:"Xi'an street food",p:"Muslim Quarter: roujiamo, lamb skewers, biangbiang noodles"}],
+  "7-food":[{d:"1–2",t:"Shanghai",p:"Xiaolongbao, red-braised pork, French Concession café scene"},{d:"3–4",t:"Chengdu",p:"Sichuan cooking class, street snacks, hotpot dinner"},{d:"5",t:"Xi'an",p:"Muslim Quarter — roujiamo, hand-pulled noodles, persimmon cake"},{d:"6–7",t:"Beijing",p:"Peking duck dinner, jiaozi dumplings, Wangfujing night snack street"}],
+  "10-food":[{d:"1–2",t:"Guangzhou",p:"Cantonese cuisine heartland — white-cut chicken, seafood, morning tea"},{d:"3–4",t:"Chengdu",p:"Sichuan peppercorn dishes, cooking class, street snacks"},{d:"5",t:"Xi'an",p:"Silk Road flavours — lamb, flat breads, pomegranate juice"},{d:"6–7",t:"Shanghai",p:"Xiaolongbao, scallion pancakes, wine bar in French Concession"},{d:"8–10",t:"Beijing",p:"Peking duck, imperial cuisine, hutong breakfast, night market finale"}],
+  "14-food":[{d:"1–2",t:"Guangzhou",p:"Yum cha, roast meats, late-night congee streets"},{d:"3–4",t:"Chengdu",p:"Sichuan hotpot, mapo tofu, dan dan noodles, cooking class"},{d:"5",t:"Chongqing",p:"Original Chongqing hotpot, spicy crayfish, noodle breakfast"},{d:"6",t:"Xi'an",p:"Muslim Quarter full day — every snack you can find"},{d:"7–8",t:"Shanghai",p:"Xiaolongbao deep dive, French Concession brunch, craft cocktails"},{d:"9–10",t:"Hangzhou",p:"West Lake fish, Longjing tea, Dongpo pork at Louwailou"},{d:"11–14",t:"Beijing",p:"Peking duck, imperial cuisine, hutong breakfast, night snack street"}]
+};
+
+function show(s,btn){
+  document.querySelectorAll('.section').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.nav button').forEach(el=>el.classList.remove('active'));
+  document.getElementById('sec-'+s).classList.add('active');
+  btn.classList.add('active');
+  if(s==='itinerary')buildItin();
+  if(s==='phrases')buildPhrases();
+}
+
+function buildCities(){
+  document.getElementById('city-grid').innerHTML=cities.map((c,i)=>`
+    <div class="card" onclick="showCity(${i})">
+      <div class="card-icon">${c.icon}</div>
+      <h3>${c.name}</h3>
+      <p>${c.desc.substring(0,80)}...</p>
+      <div class="tags">${c.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+function showCity(i){
+  const c=cities[i];
+  document.querySelectorAll('#city-grid .card').forEach((el,j)=>el.classList.toggle('selected',j===i));
+  const d=document.getElementById('city-detail');
+  d.style.display='block';
+  d.innerHTML=`<h2>${c.icon} ${c.name}</h2><p>${c.desc}</p>
+    <div class="detail-grid">
+      <div class="detail-box"><h4>Best time to visit</h4><p>${c.best}</p></div>
+      <div class="detail-box"><h4>Days recommended</h4><p>${c.days}</p></div>
+      <div class="detail-box"><h4>Stay near</h4><p>${c.stay}</p></div>
+    </div>`;
+  d.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function buildFood(){
+  document.getElementById('food-grid').innerHTML=foods.map((f,i)=>`
+    <div class="card" onclick="showFood(${i})">
+      <div class="card-icon">${f.icon}</div>
+      <h3>${f.name}</h3>
+      <p style="font-size:11px;color:#8b1a1a;margin-bottom:4px">${f.region}</p>
+      <div class="tags">${f.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+function showFood(i){
+  const f=foods[i];
+  document.querySelectorAll('#food-grid .card').forEach((el,j)=>el.classList.toggle('selected',j===i));
+  const d=document.getElementById('food-detail');
+  d.style.display='block';
+  d.innerHTML=`<h2>${f.icon} ${f.name}</h2><p style="font-size:12px;color:#8b1a1a;margin-bottom:10px">${f.region}</p><p>${f.desc}</p>`;
+  d.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function buildItin(){
+  const days=document.getElementById('itin-days').value;
+  const focus=document.getElementById('itin-focus').value;
+  const plan=itins[days+'-'+focus]||itins['7-classic'];
+  document.getElementById('itin-output').innerHTML=
+    `<h2 style="margin-bottom:20px">${days}-day ${focus.replace('-',' ')} itinerary</h2>`+
+    plan.map(s=>`<div class="itin-step">
+      <div class="day-badge">Day<br>${s.d}</div>
+      <div class="itin-body"><h4>${s.t}</h4><p>${s.p}</p></div>
+    </div>`).join('');
+}
+
+function buildPhrases(){
+  const list=document.getElementById('phrase-list');
+  if(list.children.length)return;
+  list.innerHTML=phrases.map(p=>`
+    <div class="phrase-row">
+      <div><div class="zh">${p.zh}</div><div class="py">${p.py}</div></div>
+      <div class="en">${p.en}</div>
+    </div>`).join('');
+}
+
+buildCities();
+buildFood();
+buildItin();
+</script>
+</body>
+</html>
